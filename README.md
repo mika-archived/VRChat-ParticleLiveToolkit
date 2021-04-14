@@ -4,6 +4,10 @@ Editor Tools for Particle Live Creators
 
 ## Features (ja-JP)
 
+### Bulk Insert Animation Property by Regex
+
+正規表現を用いて、 Animation Clip に対して一括でプロパティを追加します。
+
 ### Toggle Animation
 
 アバター内の任意のオブジェクトを、単純に出し入れするだけの設定を自動生成するツールです。
