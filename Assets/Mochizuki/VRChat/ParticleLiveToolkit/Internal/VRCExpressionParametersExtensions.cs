@@ -36,9 +36,11 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit.Internal
         public static void AddParameter(this VRCExpressionParameters source, VRCExpressionParameters.Parameter parameter)
         {
             var so = new SerializedObject(source);
+            so.Update();
+
             var sourceParameters = so.FindProperty(nameof(source.parameters));
 
-            sourceParameters.arraySize++;
+            sourceParameters.arraySize += 1;
 
             var idx = sourceParameters.arraySize - 1;
             sourceParameters.InsertArrayElementAtIndex(idx);

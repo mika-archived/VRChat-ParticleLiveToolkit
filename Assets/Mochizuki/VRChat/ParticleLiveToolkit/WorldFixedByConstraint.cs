@@ -61,7 +61,7 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
         {
             var parameters = CreateExpressionParameters(avatar);
             var expression = CreateExpressionMenus(avatar);
-            var animations = CreateAnimations(go);
+            var animations = CreateAnimations();
             var controller = CreateAnimatorController(avatar, animations);
 
             var prefab = LoadAssetFromGuid<GameObject>(PrefabGuid);
@@ -87,7 +87,8 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
             if (avatar.customExpressions && avatar.expressionParameters != null)
                 parameters.MergeParameters(avatar.expressionParameters);
 
-            parameters.AddParameter(new VRCExpressionParameters.Parameter { defaultValue = 0, name = InternalName, saved = false, valueType = VRCExpressionParameters.ValueType.Bool });
+            if (!parameters.HasParameter(InternalName))
+                parameters.AddParameter(new VRCExpressionParameters.Parameter { defaultValue = 0, name = InternalName, saved = false, valueType = VRCExpressionParameters.ValueType.Bool });
 
             AssetDatabase.CreateAsset(parameters, dest);
 
@@ -112,7 +113,7 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
             return expression;
         }
 
-        private static List<AnimationClip> CreateAnimations(GameObject go)
+        private static List<AnimationClip> CreateAnimations()
         {
             return new List<AnimationClip>
             {
@@ -123,7 +124,7 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
 
         private static AnimationClip CreateActivationAnimation()
         {
-            var dest = EditorUtility.SaveFilePanelInProject("Save Constraint Activation Animation to...", "Activation", "anim", "");
+            var dest = EditorUtility.SaveFilePanelInProject("Save Constraint Activation Animation to...", "ActivateWorldFixed", "anim", "");
             if (string.IsNullOrWhiteSpace(dest))
                 return null;
 
@@ -131,7 +132,7 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
 
             for (var i = 0; i < 2; i++)
             {
-                var curve = AnimationCurve.Constant(0, i / 60f, 1);
+                var curve = AnimationCurve.Constant(0, i / 60f, 0);
                 AnimationUtility.SetEditorCurve(animation, EditorCurveBinding.DiscreteCurve($"{InternalName}/ToWorld/Object", typeof(ParentConstraint), "m_Active"), curve);
             }
 
@@ -142,7 +143,7 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
 
         private static AnimationClip CreateDeactivationAnimation()
         {
-            var dest = EditorUtility.SaveFilePanelInProject("Save Constraint Deactivation Animation to...", "Deactivation", "anim", "");
+            var dest = EditorUtility.SaveFilePanelInProject("Save Constraint Deactivation Animation to...", "DeactivateWorldFixed", "anim", "");
             if (string.IsNullOrWhiteSpace(dest))
                 return null;
 
@@ -150,7 +151,7 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
 
             for (var i = 0; i < 2; i++)
             {
-                var curve = AnimationCurve.Constant(0, i / 60f, 0);
+                var curve = AnimationCurve.Constant(0, i / 60f, 1);
                 AnimationUtility.SetEditorCurve(animation, EditorCurveBinding.DiscreteCurve($"{InternalName}/ToWorld/Object", typeof(ParentConstraint), "m_Active"), curve);
             }
 
@@ -168,10 +169,10 @@ namespace Mochizuki.VRChat.ParticleLiveToolkit
             var controller = new AnimatorController();
             AssetDatabase.CreateAsset(controller, dest);
 
-            if (avatar.customizeAnimationLayers && avatar.HasAnimationLayer(VRCAvatarDescriptor.AnimLayerType.FX))
+            if (avatar.customizeAnimationLayers && avatar.HasAnimationLayer(VRCAvatarDescriptor.AnimLayerType.FX, false))
                 controller.MergeControllers((AnimatorController) avatar.GetAnimationLayer(VRCAvatarDescriptor.AnimLayerType.FX).animatorController);
 
-            if (controller.HasLayer(InternalName))
+            if (controller.HasLayer(InternalName) && controller.HasParameter(InternalName))
             {
                 AssetDatabase.SaveAssets();
                 return controller;
