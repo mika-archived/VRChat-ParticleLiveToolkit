@@ -4,6 +4,10 @@ Editor Tools for Particle Live Creators
 
 ## Features (ja-JP)
 
+### Toggle Animation
+
+アバター内の任意のオブジェクトを、単純に出し入れするだけの設定を自動生成するツールです。
+
 ### World Fixed by Constraint
 
 アバター内の任意のオブジェクトを、 Constraint を使用してワールドに固定するための設定を自動生成するツールです。  
